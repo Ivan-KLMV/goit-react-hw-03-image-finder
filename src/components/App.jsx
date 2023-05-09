@@ -6,7 +6,7 @@ import { ImageGalleryItem } from './ImageGalleryItem/ImageGalleryItem';
 export class App extends Component {
   state = { searchValue: '', images: [] };
 
-  componentDidUpdate(nextProps, nextState) {
+  componentDidUpdate(_, nextState) {
     console.log('this.state.searchValue', this.state.searchValue);
     console.log('nextState', nextState.searchValue);
     if (this.state.searchValue !== nextState.searchValue) {
