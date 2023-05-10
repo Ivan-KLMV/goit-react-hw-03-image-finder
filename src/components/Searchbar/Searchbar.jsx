@@ -11,25 +11,26 @@ export class Searchbar extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    console.log(this.state.input);
+
     if (this.state.input.trim() === '') {
       alert('Enter a request');
       return;
     }
+
     this.props.onSubmitProp(this.state.input);
     this.setState({ input: '' });
   };
 
   render() {
     return (
-      <header className="searchbar">
-        <form className="form" onSubmit={this.handleSubmit}>
-          <button type="submit" className="button">
-            <span className="button-label">Search_</span>
+      <header className="Searchbar">
+        <form className="SearchForm" onSubmit={this.handleSubmit}>
+          <button type="submit" className="SearchForm-button">
+            <span className="SearchForm-button-label">Search_</span>
           </button>
 
           <input
-            className="input"
+            className="SearchForm-input"
             type="text"
             name="input"
             autoComplete="off"
