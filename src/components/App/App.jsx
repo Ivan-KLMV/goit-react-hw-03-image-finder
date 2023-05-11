@@ -1,6 +1,6 @@
 import { Component } from 'react';
-import { Searchbar } from './Searchbar/Searchbar';
-import { ImageGallery } from './ImageGallery/ImageGallery';
+import { ImageGallery, Searchbar } from '../index';
+import { AppStyled } from './App.styled';
 
 export class App extends Component {
   state = { searchValue: '' };
@@ -11,10 +11,10 @@ export class App extends Component {
 
   render() {
     return (
-      <>
+      <AppStyled>
         <Searchbar onSubmitProp={this.seachQeryHandle} />
         <ImageGallery searchValue={this.state.searchValue} />
-      </>
+      </AppStyled>
     );
   }
 }

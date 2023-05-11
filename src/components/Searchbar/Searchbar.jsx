@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { SearchbarStyled } from './Searchbar.styled';
 
 export class Searchbar extends Component {
   state = {
@@ -11,26 +12,26 @@ export class Searchbar extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
+    const { input } = this.state;
 
-    if (this.state.input.trim() === '') {
+    if (input.trim() === '') {
       alert('Enter a request');
       return;
     }
 
-    this.props.onSubmitProp(this.state.input);
+    this.props.onSubmitProp(input);
     this.setState({ input: '' });
   };
 
   render() {
     return (
-      <header className="Searchbar">
-        <form className="SearchForm" onSubmit={this.handleSubmit}>
-          <button type="submit" className="SearchForm-button">
-            <span className="SearchForm-button-label">Search_</span>
+      <SearchbarStyled>
+        <form onSubmit={this.handleSubmit}>
+          <button type="submit">
+            <span>Search_</span>
           </button>
 
           <input
-            className="SearchForm-input"
             type="text"
             name="input"
             autoComplete="off"
@@ -40,7 +41,7 @@ export class Searchbar extends Component {
             value={this.state.input}
           />
         </form>
-      </header>
+      </SearchbarStyled>
     );
   }
 }
