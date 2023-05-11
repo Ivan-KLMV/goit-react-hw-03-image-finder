@@ -1,9 +1,13 @@
-export const ImageGalleryItem = ({ images }) => {
+import { ImageGalleryItemStyled } from './ImageGalleryItem.styled';
+
+export const ImageGalleryItem = ({ images, onClick }) => {
   return images.map(image => (
-    <li key={image.id} className="ImageGalleryItem-image">
-      <a href={image.largeImageURL}>
-        <img src={image.webformatURL} alt={image.tags} />
-      </a>
-    </li>
+    <ImageGalleryItemStyled key={image.id}>
+      <img
+        src={image.webformatURL}
+        alt={image.tags}
+        onClick={() => onClick(image.largeImageURL)}
+      />
+    </ImageGalleryItemStyled>
   ));
 };
