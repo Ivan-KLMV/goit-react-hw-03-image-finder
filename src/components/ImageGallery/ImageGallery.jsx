@@ -1,20 +1,35 @@
 import { Component } from 'react';
-import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
-import { LoadMoreButton } from 'components/LoadMoreButton/LoadMoreButton';
+import { ThreeDots } from 'react-loader-spinner';
+import { ImageGalleryStyled } from './ImageGallery.styled';
+import { getImagesApi } from '../../services/getResponse';
+import {
+  ImageGalleryItem,
+  LoadMoreButton,
+  Modal,
+  FooterMessage,
+} from '../index';
 
 export class ImageGallery extends Component {
   state = {
     searchValue: '',
     images: [],
     currentPage: 1,
-    isLoading: false,
     totalHits: 0,
+    isLoading: false,
+    showModal: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.searchValue !== this.props.searchValue) {
+    const nextPage = this.state.currentPage;
+    const currentPage = prevState.currentPage;
+    const newSearch = this.props.searchValue;
+    const currentSearch = prevProps.searchValue;
+    const newSearchInstate = this.state.searchValue;
+    const prevSearchInState = prevState.searchValue;
+
+    if (currentSearch !== newSearch) {
       this.setState({
-        searchValue: this.props.searchValue,
+        searchValue: newSearch,
         images: [],
         currentPage: 1,
         error: null,
@@ -22,23 +37,14 @@ export class ImageGallery extends Component {
       return;
     }
 
-    if (
-      this.state.searchValue !== prevState.searchValue ||
-      this.state.currentPage !== prevState.currentPage
-    ) {
+    if (newSearchInstate !== prevSearchInState || nextPage !== currentPage) {
       this.setState({ isLoading: true });
 
-      fetch(
-        `https://pixabay.com/api/?q=${this.state.searchValue}&page=${this.state.currentPage}&key=34585976-51a68d3a5f9444fd8119e93c8&image_type=photo&orientation=horizontal&per_page=12`
-      )
-        .then(res => {
-          return res.json();
-        })
+      getImagesApi(newSearchInstate, nextPage)
         .then(data => {
-          // console.log(data);
           if (data.hits.length > 0) {
-            this.setState(prevState => ({
-              images: [...prevState.images, ...data.hits],
+            this.setState(({ images }) => ({
+              images: [...images, ...data.hits],
               totalHits: data.totalHits,
             }));
             return;
@@ -55,27 +61,54 @@ export class ImageGallery extends Component {
   }
 
   loadMoreHandle = () => {
-    this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
+    this.setState(({ currentPage }) => ({ currentPage: currentPage + 1 }));
+  };
+
+  toggleModal = link => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+      largeImageURL: link,
+    }));
+    // return link;
   };
 
   render() {
+    const { images, totalHits, isLoading, showModal, error, largeImageURL } =
+      this.state;
+    const loadMoreButtonCondition =
+      images.length > 0 && totalHits !== images.length;
+    const footerMessageCondition =
+      images.length > 0 && totalHits === images.length;
+
     return (
       <>
-        <ul className="ImageGallery">
-          {this.state.error && <h1>{this.state.error.message}</h1>}
-          {<ImageGalleryItem images={this.state.images} />}
-          {this.state.isLoading && <div>Loading...</div>}
-        </ul>
-        {this.state.images.length > 0 &&
-          this.state.totalHits !== this.state.images.length && (
-            <LoadMoreButton loadMoreHandle={this.loadMoreHandle} />
+        <ImageGalleryStyled>
+          {error && <h1>{error.message}</h1>}
+          {images.length > 0 && (
+            <ImageGalleryItem images={images} onClick={this.toggleModal} />
           )}
-        {this.state.images.length > 0 &&
-          this.state.totalHits === this.state.images.length && (
-            <div>
-              "We're sorry, but you've reached the end of search results."
-            </div>
-          )}
+        </ImageGalleryStyled>
+        {isLoading && (
+          <ThreeDots
+            color="#3f51b5"
+            ariaLabel="three-dots-loading"
+            wrapperStyle={{ margin: ' 0 auto' }}
+          />
+        )}
+
+        {loadMoreButtonCondition && (
+          <LoadMoreButton loadMoreHandle={this.loadMoreHandle} />
+        )}
+        {footerMessageCondition && (
+          <FooterMessage>
+            We're sorry, but you've reached the end of search results.
+          </FooterMessage>
+        )}
+        {showModal && (
+          <Modal onClickProp={this.toggleModal}>
+            <img src={largeImageURL} alt="big view" />
+          </Modal>
+        )}
       </>
     );
   }
